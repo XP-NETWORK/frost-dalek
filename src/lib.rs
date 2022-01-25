@@ -452,7 +452,7 @@
 //! // some additional context, such as public information about the run of the protocol.
 //! let message_hash = compute_message_hash(&context[..], &message[..]);
 //!
-//! let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), &context[..], &message[..]);
+//! let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! # Ok(()) }
 //! # #[cfg(feature = "std")]
 //! # fn main() { assert!(do_test().is_ok()); }
@@ -527,7 +527,7 @@
 //! #
 //! # let message_hash = compute_message_hash(&context[..], &message[..]);
 //! #
-//! # let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), &context[..], &message[..]);
+//! # let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! #
 //! aggregator.include_signer(1, alice_public_comshares.commitments[0], alice_public_key);
 //! aggregator.include_signer(3, carol_public_comshares.commitments[0], carol_public_key);
@@ -609,7 +609,7 @@
 //! #
 //! # let message_hash = compute_message_hash(&context[..], &message[..]);
 //! #
-//! # let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), &context[..], &message[..]);
+//! # let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! #
 //! # aggregator.include_signer(1, alice_public_comshares.commitments[0], (&alice_secret_key).into());
 //! # aggregator.include_signer(3, carol_public_comshares.commitments[0], (&carol_secret_key).into());

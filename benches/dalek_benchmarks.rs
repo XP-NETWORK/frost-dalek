@@ -260,7 +260,7 @@ mod sign_benches {
         let (p3_public_comshares, _p3_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 3, 1);
         let (p4_public_comshares, _p4_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 4, 1);
 
-        let mut aggregator = SignatureAggregator::new(params, group_key, &context[..], &message[..]);
+        let mut aggregator = SignatureAggregator::new(params, group_key, context.to_vec(), message.to_vec());
 
         aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
         aggregator.include_signer(3, p3_public_comshares.commitments[0], (&p3_sk).into());
@@ -361,7 +361,7 @@ mod sign_benches {
         let (p3_public_comshares, mut p3_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 3, 1);
         let (p4_public_comshares, mut p4_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 4, 1);
 
-        let mut aggregator = SignatureAggregator::new(params, group_key, &context[..], &message[..]);
+        let mut aggregator = SignatureAggregator::new(params, group_key, context.to_vec(), message.to_vec());
 
         aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
         aggregator.include_signer(3, p3_public_comshares.commitments[0], (&p3_sk).into());
@@ -472,7 +472,7 @@ mod sign_benches {
         let (p3_public_comshares, mut p3_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 3, 1);
         let (p4_public_comshares, mut p4_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 4, 1);
 
-        let mut aggregator = SignatureAggregator::new(params, group_key, &context[..], &message[..]);
+        let mut aggregator = SignatureAggregator::new(params, group_key, context.to_vec(), message.to_vec());
 
         aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
         aggregator.include_signer(3, p3_public_comshares.commitments[0], (&p3_sk).into());

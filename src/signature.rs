@@ -94,8 +94,10 @@ impl PartialEq for Signer {
 /// signing protocol during the first phase of a signature creation.
 #[derive(Debug)]
 pub struct PartialThresholdSignature {
-    pub(crate) index: u32,
-    pub(crate) z: Scalar,
+    /// Index of the signature
+    pub index: u32,
+    /// Z component of sig
+    pub z: Scalar,
 }
 
 /// A complete, aggregated threshold signature.
@@ -414,14 +416,14 @@ pub struct SignatureAggregator<A: Aggregator> {
 /// The initial state for a [`SignatureAggregator`], which may include invalid
 /// or non-sensical data.
 #[derive(Debug)]
-pub struct Initial<'sa> {
+pub struct Initial {
     /// An optional context string for computing the message hash.
-    pub(crate) context: &'sa [u8],
+    pub(crate) context: Vec<u8>,
     /// The message to be signed.
-    pub(crate) message: &'sa [u8],
+    pub(crate) message: Vec<u8>,
 }
 
-impl Aggregator for Initial<'_> {}
+impl Aggregator for Initial {}
 
 /// The finalized state for a [`SignatureAggregator`], which has thoroughly
 /// validated its data.
@@ -445,7 +447,7 @@ pub struct Finalized {
 
 impl Aggregator for Finalized {}
 
-impl SignatureAggregator<Initial<'_>> {
+impl SignatureAggregator<Initial> {
     /// Construct a new signature aggregator from some protocol instantiation
     /// `parameters` and a `message` to be signed.
     ///
@@ -465,12 +467,12 @@ impl SignatureAggregator<Initial<'_>> {
     /// # Returns
     ///
     /// A new [`SignatureAggregator`].
-    pub fn new<'sa>(
+    pub fn new(
         parameters: Parameters,
         group_key: GroupKey,
-        context: &'sa [u8],
-        message: &'sa [u8],
-    ) -> SignatureAggregator<Initial<'sa>> {
+        context: Vec<u8>,
+        message: Vec<u8>,
+    ) -> SignatureAggregator<Initial> {
         let signers: Vec<Signer> = Vec::with_capacity(parameters.t as usize);
         let public_keys = IndividualPublicKeys::new();
         let partial_signatures = PartialThresholdSignatures::new();
@@ -712,7 +714,7 @@ mod test {
         let message = b"This is a test of the tsunami alert system. This is only a test.";
         let (p1_public_comshares, mut p1_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 1, 1);
 
-        let mut aggregator = SignatureAggregator::new(params, group_key, &context[..], &message[..]);
+        let mut aggregator = SignatureAggregator::new(params, group_key, context.to_vec(), message.to_vec());
 
         aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
 
@@ -756,7 +758,7 @@ mod test {
         let message = b"This is a test of the tsunami alert system. This is only a test.";
         let (p1_public_comshares, mut p1_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 1, 1);
 
-        let mut aggregator = SignatureAggregator::new(params, group_key, &context[..], &message[..]);
+        let mut aggregator = SignatureAggregator::new(params, group_key, context.to_vec(), message.to_vec());
 
         aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
 
@@ -808,7 +810,7 @@ mod test {
         let message = b"This is a test of the tsunami alert system. This is only a test.";
         let (p1_public_comshares, mut p1_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 1, 1);
 
-        let mut aggregator = SignatureAggregator::new(params, group_key, &context[..], &message[..]);
+        let mut aggregator = SignatureAggregator::new(params, group_key, context.to_vec(), message.to_vec());
 
         aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
 
@@ -914,7 +916,7 @@ mod test {
         let (p3_public_comshares, mut p3_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 3, 1);
         let (p4_public_comshares, mut p4_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 4, 1);
 
-        let mut aggregator = SignatureAggregator::new(params, group_key, &context[..], &message[..]);
+        let mut aggregator = SignatureAggregator::new(params, group_key, context.to_vec(), message.to_vec());
 
         aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
         aggregator.include_signer(3, p3_public_comshares.commitments[0], (&p3_sk).into());
@@ -1002,7 +1004,7 @@ mod test {
         let (p1_public_comshares, mut p1_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 1, 1);
         let (p2_public_comshares, mut p2_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 2, 1);
 
-        let mut aggregator = SignatureAggregator::new(params, group_key.clone(), &context[..], &message[..]);
+        let mut aggregator = SignatureAggregator::new(params, group_key.clone(), context.to_vec(), message.to_vec());
 
         aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
         aggregator.include_signer(2, p2_public_comshares.commitments[0], (&p2_sk).into());
@@ -1038,7 +1040,7 @@ mod test {
         let (p1_public_comshares, _) = generate_commitment_share_lists(&mut OsRng, 1, 1);
         let (p2_public_comshares, _) = generate_commitment_share_lists(&mut OsRng, 2, 1);
 
-        let mut aggregator = SignatureAggregator::new(params, GroupKey(RistrettoPoint::identity()), &context[..], &message[..]);
+        let mut aggregator = SignatureAggregator::new(params, GroupKey(RistrettoPoint::identity()), context.to_vec(), message.to_vec());
 
         let p1_sk = SecretKey{ index: 1, key: Scalar::random(&mut OsRng) };
         let p2_sk = SecretKey{ index: 2, key: Scalar::random(&mut OsRng) };

@@ -119,7 +119,7 @@ fn signing_and_verification_3_out_of_5() {
     let (p3_public_comshares, mut p3_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 3, 1);
     let (p4_public_comshares, mut p4_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 4, 1);
 
-    let mut aggregator = SignatureAggregator::new(params, group_key, &context[..], &message[..]);
+    let mut aggregator = SignatureAggregator::new(params, group_key, context.to_vec(), message.to_vec());
 
     aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
     aggregator.include_signer(3, p3_public_comshares.commitments[0], (&p3_sk).into());
@@ -196,7 +196,7 @@ fn signing_and_verification_with_ed25519_dalek_2_out_of_3() {
     let (p1_public_comshares, mut p1_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 1, 1);
     let (p3_public_comshares, mut p3_secret_comshares) = generate_commitment_share_lists(&mut OsRng, 3, 1);
 
-    let mut aggregator = SignatureAggregator::new(params, group_key, &context[..], &message[..]);
+    let mut aggregator = SignatureAggregator::new(params, group_key, context.to_vec(), message.to_vec());
 
     aggregator.include_signer(1, p1_public_comshares.commitments[0], (&p1_sk).into());
     aggregator.include_signer(3, p3_public_comshares.commitments[0], (&p3_sk).into());
