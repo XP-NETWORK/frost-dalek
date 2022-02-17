@@ -190,6 +190,7 @@ use zeroize::Zeroize;
 
 use crate::nizk::NizkOfSecretKey;
 use crate::parameters::Parameters;
+use crate::signature::to_edwards;
 
 /// A struct for holding a shard of the shared secret, in order to ensure that
 /// the shard is overwritten with zeroes when it falls out of scope.
@@ -775,6 +776,11 @@ impl GroupKey {
         let point = CompressedRistretto(bytes).decompress().ok_or(())?;
 
         Ok(GroupKey(point))
+    }
+
+    /// Convert key to ed25519 compatible key
+    pub fn to_ed25519(&self) -> [u8; 32] {
+        return to_edwards(self.0).compress().to_bytes();
     }
 }
 

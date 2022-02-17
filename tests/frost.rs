@@ -188,7 +188,7 @@ fn signing_and_verification_with_ed25519_dalek_2_out_of_3() {
     let p3_state = p3_state.to_round_two(p3_my_secret_shares).unwrap();
 
     let (group_key, p1_sk) = p1_state.finish(p1.public_key().unwrap()).unwrap();
-    let (_, p2_sk) = p2_state.finish(p2.public_key().unwrap()).unwrap();
+    let (_, _p2_sk) = p2_state.finish(p2.public_key().unwrap()).unwrap();
     let (_, p3_sk) = p3_state.finish(p3.public_key().unwrap()).unwrap();
 
     let context = b"CONTEXT STRING STOLEN FROM DALEK TEST SUITE";
@@ -216,26 +216,10 @@ fn signing_and_verification_with_ed25519_dalek_2_out_of_3() {
 
     assert!(verification_result.is_ok());
 
-    let signature_bytes = threshold_signature.to_bytes();
+    let signature_bytes = threshold_signature.to_ed25519();
     let signature = ed25519_dalek::Signature::from(signature_bytes);
 
-    let public_key_bytes = group_key.to_bytes();
-    let public_key = ed25519_dalek::PublicKey::from_bytes(&public_key_bytes[..]);
-
-    if public_key.is_ok() {
-        let pk = public_key.unwrap();
-        println!("Verifying signature");
-        let verified = pk.verify(&message_hash[..], &signature).is_ok();
-
-        if verified {
-            println!("Public key was okay? {:?}", pk.to_bytes());
-            println!("Signature checked out? {:?}", signature_bytes);
-            println!("p1 secret key: {:?}", p1_sk);
-            println!("p2 secret key: {:?}", p2_sk);
-            println!("p3 secret key: {:?}", p3_sk);
-            println!("p1 secret commitment shares: {:?}", p1_secret_comshares);
-            println!("p3 secret commitment shares: {:?}", p3_secret_comshares);
-            assert!(false);
-        }
-    }
+    let public_key_bytes = group_key.to_ed25519();
+    let public_key = ed25519_dalek::PublicKey::from_bytes(&public_key_bytes[..]).unwrap();
+    assert!(public_key.verify(&message_hash[..], &signature).is_ok());
 }

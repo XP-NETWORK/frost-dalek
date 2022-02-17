@@ -23,9 +23,12 @@ use std::cmp::Ordering;
 #[cfg(feature = "std")]
 use std::vec::Vec;
 
+use core::mem::transmute;
+
 use curve25519_dalek::constants::RISTRETTO_BASEPOINT_TABLE;
 use curve25519_dalek::ristretto::CompressedRistretto;
 use curve25519_dalek::ristretto::RistrettoPoint;
+use curve25519_dalek::edwards::EdwardsPoint;
 use curve25519_dalek::scalar::Scalar;
 
 use sha2::Digest;
@@ -37,6 +40,19 @@ use crate::parameters::Parameters;
 use crate::precomputation::SecretCommitmentShareList;
 
 pub use crate::keygen::SecretKey;
+
+const EINVB: [u8; 32] = [121, 47, 220, 226, 41, 229, 6, 97,
+208, 218, 28, 125, 179, 157, 211, 7,
+0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 6
+];
+
+pub(crate) fn to_edwards(r: RistrettoPoint) -> EdwardsPoint {
+    let ep: EdwardsPoint = unsafe { transmute(r) };
+    let einv = Scalar::from_canonical_bytes(EINVB).unwrap();
+
+    return ep.mul_by_cofactor() * einv;
+}
 
 // XXX Nonce reuse is catastrophic and results in obtaining an individual
 //     signer's long-term secret key; it must be prevented at all costs.
@@ -113,6 +129,14 @@ impl ThresholdSignature {
 
         Ok(ThresholdSignature { R, z })
     }
+
+    /// convert to ed25519 bytes
+    pub fn to_ed25519(&self) -> [u8; 64] {
+        let mut bytes = [0u8; 64];
+        bytes[..32].copy_from_slice(&to_edwards(self.R).compress().as_bytes()[..]);
+        bytes[32..].copy_from_slice(&self.z.as_bytes()[..]);
+        bytes
+    } 
 }
 
 macro_rules! impl_indexed_hashmap {
@@ -246,9 +270,9 @@ fn compute_challenge(message_hash: &[u8; 64], group_key: &GroupKey, R: &Ristrett
 
     // XXX [PAPER] Decide if we want a context string for the challenge.  This
     // would break compatibility with standard ed25519 libraries for verification.
-    h2.update(b"FROST-SHA512");
-    h2.update(R.compress().as_bytes());
-    h2.update(group_key.to_bytes());
+    //h2.update(b"FROST-SHA512");
+    h2.update(to_edwards(*R).compress().to_bytes());
+    h2.update(group_key.to_ed25519());
     h2.update(&message_hash[..]);
 
     Scalar::from_hash(h2)
@@ -627,7 +651,7 @@ impl SignatureAggregator<Finalized> {
 
         match ! misbehaving_participants.is_empty() {
             true => Err(misbehaving_participants),
-            false => Ok(ThresholdSignature {z, R}),
+            false => Ok(ThresholdSignature {z, R: R}),
         }
     }
 }
