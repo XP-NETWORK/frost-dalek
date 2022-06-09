@@ -792,7 +792,7 @@ mod test {
     use crate::precomputation::generate_commitment_share_lists;
 
     #[cfg(feature = "std")]
-    use crate::signature::{calculate_lagrange_coefficients, compute_message_hash};
+    use crate::signature::{calculate_lagrange_coefficients, compute_sha256_hash};
     #[cfg(feature = "std")]
     use crate::signature::SignatureAggregator;
 
@@ -889,7 +889,7 @@ mod test {
         aggregator.include_signer(2, p2_public_comshares.commitments[0], (&p2_sk).into());
 
         let signers = aggregator.get_signers();
-        let message_hash = compute_message_hash(&context[..], &message[..]);
+        let message_hash = compute_sha256_hash(&context[..], &message[..]);
 
         let p1_partial = p1_sk.sign(&message_hash, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
         let p2_partial = p2_sk.sign(&message_hash, &group_key, &mut p2_secret_comshares, 0, signers).unwrap();

@@ -388,7 +388,7 @@
 //!
 //! ```rust
 //! # #[cfg(feature = "std")]
-//! use frost_dalek::compute_message_hash;
+//! use frost_dalek::compute_sha256_hash;
 //! # #[cfg(feature = "std")]
 //! use frost_dalek::generate_commitment_share_lists;
 //! # use frost_dalek::DistributedKeyGeneration;
@@ -450,7 +450,7 @@
 //!
 //! // Every signer should compute a hash of the message to be signed, along with, optionally,
 //! // some additional context, such as public information about the run of the protocol.
-//! let message_hash = compute_message_hash(&context[..], &message[..]);
+//! let message_hash = compute_sha256_hash(&context[..], &message[..]);
 //!
 //! let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! # Ok(()) }
@@ -465,7 +465,7 @@
 //!
 //! ```rust
 //! # #[cfg(feature = "std")]
-//! # use frost_dalek::compute_message_hash;
+//! # use frost_dalek::compute_sha256_hash;
 //! # #[cfg(feature = "std")]
 //! # use frost_dalek::generate_commitment_share_lists;
 //! # use frost_dalek::DistributedKeyGeneration;
@@ -525,7 +525,7 @@
 //! # let context = b"CONTEXT STRING STOLEN FROM DALEK TEST SUITE";
 //! # let message = b"This is a test of the tsunami alert system. This is only a test.";
 //! #
-//! # let message_hash = compute_message_hash(&context[..], &message[..]);
+//! # let message_hash = compute_sha256_hash(&context[..], &message[..]);
 //! #
 //! # let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! #
@@ -548,7 +548,7 @@
 //!
 //! ```rust
 //! # #[cfg(feature = "std")]
-//! # use frost_dalek::compute_message_hash;
+//! # use frost_dalek::compute_sha256_hash;
 //! # #[cfg(feature = "std")]
 //! # use frost_dalek::generate_commitment_share_lists;
 //! # use frost_dalek::DistributedKeyGeneration;
@@ -607,7 +607,7 @@
 //! # let context = b"CONTEXT STRING STOLEN FROM DALEK TEST SUITE";
 //! # let message = b"This is a test of the tsunami alert system. This is only a test.";
 //! #
-//! # let message_hash = compute_message_hash(&context[..], &message[..]);
+//! # let message_hash = compute_sha256_hash(&context[..], &message[..]);
 //! #
 //! # let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! #
@@ -704,6 +704,6 @@ pub use parameters::Parameters;
 pub use precomputation::generate_commitment_share_lists;
 
 #[cfg(feature = "std")]
-pub use signature::compute_message_hash;
+pub use signature::{compute_message_hash, compute_sha256_hash};
 #[cfg(feature = "std")]
 pub use signature::SignatureAggregator;

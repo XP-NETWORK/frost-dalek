@@ -16,7 +16,7 @@ use ed25519_dalek::Verifier;
 use rand::rngs::OsRng;
 
 #[cfg(feature = "std")]
-use frost_dalek::compute_message_hash;
+use frost_dalek::compute_sha256_hash;
 #[cfg(feature = "std")]
 use frost_dalek::generate_commitment_share_lists;
 
@@ -126,11 +126,11 @@ fn signing_and_verification_3_out_of_5() {
     aggregator.include_signer(4, p4_public_comshares.commitments[0], (&p4_sk).into());
 
     let signers = aggregator.get_signers();
-    let message_hash = compute_message_hash(&context[..], &message[..]);
+    let message_hash = compute_sha256_hash(&context[..], &message[..]);
 
-    let p1_partial = p1_sk.sign(&message_hash, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
-    let p3_partial = p3_sk.sign(&message_hash, &group_key, &mut p3_secret_comshares, 0, signers).unwrap();
-    let p4_partial = p4_sk.sign(&message_hash, &group_key, &mut p4_secret_comshares, 0, signers).unwrap();
+    let p1_partial = p1_sk.sign(&message_hash, &group_key, &mut p1_secret_comshares, 0, signers.as_slice()).unwrap();
+    let p3_partial = p3_sk.sign(&message_hash, &group_key, &mut p3_secret_comshares, 0, signers.as_slice()).unwrap();
+    let p4_partial = p4_sk.sign(&message_hash, &group_key, &mut p4_secret_comshares, 0, signers.as_slice()).unwrap();
 
     aggregator.include_partial_signature(p1_partial);
     aggregator.include_partial_signature(p3_partial);
@@ -202,10 +202,10 @@ fn signing_and_verification_with_ed25519_dalek_2_out_of_3() {
     aggregator.include_signer(3, p3_public_comshares.commitments[0], (&p3_sk).into());
 
     let signers = aggregator.get_signers();
-    let message_hash = compute_message_hash(&context[..], &message[..]);
+    let message_hash = compute_sha256_hash(&context[..], &message[..]);
 
-    let p1_partial = p1_sk.sign(&message_hash, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
-    let p3_partial = p3_sk.sign(&message_hash, &group_key, &mut p3_secret_comshares, 0, signers).unwrap();
+    let p1_partial = p1_sk.sign(&message_hash, &group_key, &mut p1_secret_comshares, 0, signers.as_slice()).unwrap();
+    let p3_partial = p3_sk.sign(&message_hash, &group_key, &mut p3_secret_comshares, 0, signers.as_slice()).unwrap();
 
     aggregator.include_partial_signature(p1_partial);
     aggregator.include_partial_signature(p3_partial);
