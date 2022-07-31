@@ -450,7 +450,10 @@
 //!
 //! // Every signer should compute a hash of the message to be signed, along with, optionally,
 //! // some additional context, such as public information about the run of the protocol.
-//! let message_hash = compute_sha256_hash(&context[..], &message[..]);
+//! let message_hash = compute_sha256_hash(&message[..]);
+//! let mut context_vec = context.to_vec();
+//! // This vecshould be used
+//! context_vec.extend_from_slice(&message_hash);
 //!
 //! let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! # Ok(()) }
@@ -525,7 +528,9 @@
 //! # let context = b"CONTEXT STRING STOLEN FROM DALEK TEST SUITE";
 //! # let message = b"This is a test of the tsunami alert system. This is only a test.";
 //! #
-//! # let message_hash = compute_sha256_hash(&context[..], &message[..]);
+//! # let message_hash = compute_sha256_hash(&message[..]);
+//! # let mut context_vec = context.to_vec();
+//! # context_vec.extend_from_slice(&message_hash);
 //! #
 //! # let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! #
@@ -607,7 +612,9 @@
 //! # let context = b"CONTEXT STRING STOLEN FROM DALEK TEST SUITE";
 //! # let message = b"This is a test of the tsunami alert system. This is only a test.";
 //! #
-//! # let message_hash = compute_sha256_hash(&context[..], &message[..]);
+//! # let message_hash = compute_sha256_hash(&message[..]);
+//! # let mut context_vec = context.to_vec();
+//! # context_vec.extend_from_slice(&message_hash);
 //! #
 //! # let mut aggregator = SignatureAggregator::new(params, bob_group_key.clone(), context.to_vec(), message.to_vec());
 //! #

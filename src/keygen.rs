@@ -889,10 +889,12 @@ mod test {
         aggregator.include_signer(2, p2_public_comshares.commitments[0], (&p2_sk).into());
 
         let signers = aggregator.get_signers();
-        let message_hash = compute_sha256_hash(&context[..], &message[..]);
+        let message_hash = compute_sha256_hash(&message[..]);
+        let mut context_vec = context.to_vec();
+        context_vec.extend_from_slice(&message_hash[..]);
 
-        let p1_partial = p1_sk.sign(&message_hash, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
-        let p2_partial = p2_sk.sign(&message_hash, &group_key, &mut p2_secret_comshares, 0, signers).unwrap();
+        let p1_partial = p1_sk.sign(&context_vec, &group_key, &mut p1_secret_comshares, 0, signers).unwrap();
+        let p2_partial = p2_sk.sign(&context_vec, &group_key, &mut p2_secret_comshares, 0, signers).unwrap();
 
         aggregator.include_partial_signature(p1_partial);
         aggregator.include_partial_signature(p2_partial);
@@ -904,7 +906,7 @@ mod test {
 
         let threshold_signature = signing_result.unwrap();
 
-        let verification_result = threshold_signature.verify(&group_key, &message_hash);
+        let verification_result = threshold_signature.verify(&group_key, &context_vec);
 
         println!("{:?}", verification_result);
 
